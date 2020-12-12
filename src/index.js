@@ -14,7 +14,6 @@ class Square extends React.Component {
                 className='square'
                 onClick={() => {
                     this.props.onClick();
-                    console.log('点击了');
                 }
             }>
                 {this.props.value}
@@ -31,7 +30,6 @@ class Board extends React.Component {
                 />;
     }
     render() {
-
         return (
             <div>
                 <div className='status'>{this.props.status}</div>
@@ -63,10 +61,8 @@ class Game extends React.Component {
             xIsNext: true,
             history: []
         };
-        console.log('初始状态的squares', this.state.hostory);
     }
     handleClick(i) {
-        console.log('handleClick', this.state.hostory);
         const squares = JSON.parse(JSON.stringify(this.state.squares));
         if (this.calculateWinner(squares) || squares[i]) {
             return;
@@ -77,7 +73,6 @@ class Game extends React.Component {
             xIsNext: !this.state.xIsNext,
             history: this.state.history.concat([squares])
         }, () => {
-            console.log('setstate', this.state);
         });
     }
     calculateWinner(squares) {
@@ -116,12 +111,11 @@ class Game extends React.Component {
             currentStep = this.state.history[this.state.history.length - 1];
             moves = this.state.history.map((item, index) => {
                 return (
-                    <li>
+                    <li key={index}>
                         <button onClick={() => this.jumpTo(item)}>{'第' + (index + 1) + '步: ' + JSON.stringify(item)}</button>
                     </li>
                 );
             });
-            console.log('currentStep', currentStep);
         }
         return (
             <div className='game'>
