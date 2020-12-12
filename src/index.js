@@ -95,8 +95,13 @@ class Game extends React.Component {
         return null;
     }
     jumpTo(move) {
+        let setpNumber = 0;
+        move.forEach(item => {
+            item && setpNumber++;
+        });
         this.setState({
-            squares: move
+            squares: move,
+            xIsNext: !(setpNumber % 2)
         });
     }
     render() {
