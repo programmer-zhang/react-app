@@ -24,61 +24,17 @@ class Square extends React.Component {
 }
 
 class Board extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            squares: Array(9).fill(null),
-            xIsNext: true
-        };
-        console.log(this.state.square);
-    }
-    handleClick(i) {
-        console.log('handleClick', i);
-        const squares = JSON.parse(JSON.stringify(this.state.squares));
-        if (this.calculateWinner(squares) || squares[i]) {
-            return;
-        }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
-        this.setState({
-            squares: squares,
-            xIsNext: !this.state.xIsNext
-        });
-    }
     renderSquare(i) {
         return <Square
-                    value={this.state.squares[i]}
-                    onClick={() => this.handleClick(i)}
+                    value={this.props.squares[i]}
+                    onClick={() => this.props.onClick(i)}
                 />;
     }
-    calculateWinner(squares) {
-        const lines = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-        for (let i = 0; i < lines.length; i++) {
-            const [a, b, c] = lines[i];
-            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                return squares[a];
-            }
-        }
-        return null;
-    }
     render() {
-        const winner = this.calculateWinner(this.state.squares);
-        let status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-        if (winner) {
-            status = 'winner: ' + (!this.state.xIsNext ? 'X' : 'O');
-        }
 
         return (
             <div>
-                <div className='status'>{status}</div>
+                <div className='status'>{this.props.status}</div>
                 <div className='board-row'>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
@@ -100,18 +56,88 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            squares: Array(9).fill(null),
+            xIsNext: true,
+            history: []
+        };
+        console.log('初始状态的squares', this.state.hostory);
+    }
+    handleClick(i) {
+        console.log('handleClick', this.state.hostory);
+        const squares = JSON.parse(JSON.stringify(this.state.squares));
+        if (this.calculateWinner(squares) || squares[i]) {
+            return;
+        }
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({
+            squares: squares,
+            xIsNext: !this.state.xIsNext,
+            history: this.state.history.concat([squares])
+        }, () => {
+            console.log('setstate', this.state);
+        });
+    }
+    calculateWinner(squares) {
+        const lines = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+        for (let i = 0; i < lines.length; i++) {
+            const [a, b, c] = lines[i];
+            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+                return squares[a];
+            }
+        }
+        return null;
+    }
+    jumpTo(move) {
+        this.setState({
+            squares: move
+        });
+    }
     render() {
+        const winner = this.calculateWinner(this.state.squares);
+        let status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+        if (winner) {
+            status = 'winner: ' + (!this.state.xIsNext ? 'X' : 'O');
+        }
+        let currentStep = [];
+        let moves = '暂无动作';
+        if (this.state.history && this.state.history.length) {
+            currentStep = this.state.history[this.state.history.length - 1];
+            moves = this.state.history.map((item, index) => {
+                return (
+                    <li>
+                        <button onClick={() => this.jumpTo(item)}>{'第' + (index + 1) + '步: ' + JSON.stringify(item)}</button>
+                    </li>
+                );
+            });
+            console.log('currentStep', currentStep);
+        }
         return (
             <div className='game'>
                 <div className='game-board'>
-                    <Board />
+                    <Board
+                        status={status}
+                        squares={this.state.squares}
+                        onClick={(i) => this.handleClick(i)}
+                    />
                 </div>
                 <div className='game-info'>
                     <div>{
                         /* status */
                     }</div>
                     <ol>{
-                        /* TODO */
+                        moves
                     }</ol>
                 </div>
             </div>
