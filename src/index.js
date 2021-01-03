@@ -1,5 +1,5 @@
 /**
- * @file react index.js
+ * @file react learn page index.js
  * @author savuer
  */
 
